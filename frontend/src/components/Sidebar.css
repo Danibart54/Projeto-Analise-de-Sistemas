@@ -1,0 +1,53 @@
+.sidebar {
+  width: var(--sidebar-w); height: 100vh;
+  background: var(--navy-mid); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; padding: 20px 0;
+  position: fixed; left: 0; top: 0; z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 20px 24px; border-bottom: 1px solid var(--border);
+}
+.logo-mark {
+  width: 36px; height: 36px; background: var(--teal);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; color: var(--navy); font-family: var(--mono);
+  flex-shrink: 0;
+}
+.logo-text { font-size: 18px; font-weight: 700; color: var(--text); }
+
+.sidebar-user {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px; margin: 12px 0; border-bottom: 1px solid var(--border);
+}
+.user-avatar {
+  width: 36px; height: 36px; background: linear-gradient(135deg, var(--teal), var(--teal-dim));
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 15px; color: var(--navy); flex-shrink: 0;
+}
+.user-info { min-width: 0; }
+.user-name { display: block; font-size: 14px; font-weight: 600; truncate; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-role { display: block; font-size: 11px; color: var(--teal); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+
+.sidebar-nav { flex: 1; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 8px;
+  border: none; background: transparent; color: var(--text-muted);
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  width: 100%; text-align: left; transition: all 0.15s;
+}
+.nav-item:hover { background: var(--card); color: var(--text); }
+.nav-item.active { background: rgba(0,212,170,0.12); color: var(--teal); }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+
+.sidebar-logout {
+  margin: 12px; padding: 10px 12px; border-radius: 8px;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-muted); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; transition: all 0.15s;
+}
+.sidebar-logout:hover { background: rgba(231,76,60,0.1); color: var(--red); border-color: rgba(231,76,60,0.3); }

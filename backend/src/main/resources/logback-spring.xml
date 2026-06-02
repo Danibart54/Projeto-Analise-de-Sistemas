@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- ── Console (desenvolvimento) ──────────────────────────────────────── -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ── Arquivo geral da aplicação (rolling por dia) ────────────────────── -->
+    <appender name="APP_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/extensflow.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/extensflow.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>   <!-- manter 30 dias -->
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+        V-10 — Arquivo exclusivo de AUDITORIA de segurança (rolling por dia).
+        Separado dos logs gerais para:
+          • Facilitar análise forense e monitoramento SIEM
+          • Permitir retenção diferenciada (ex: 1 ano para auditoria)
+          • Garantir que eventos críticos não sejam "afogados" em logs de debug
+    -->
+    <appender name="AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/auditoria.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/auditoria.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>365</maxHistory>  <!-- retenção de 1 ano para auditoria -->
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <!-- Formato estruturado para facilitar ingestão por SIEM (Splunk, ELK, etc.) -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} AUDIT %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ── Roteamento do logger AUDITORIA para arquivo dedicado ─────────────── -->
+    <logger name="AUDITORIA" level="INFO" additivity="false">
+        <appender-ref ref="AUDIT_FILE"/>
+        <appender-ref ref="CONSOLE"/>   <!-- também no console em dev -->
+    </logger>
+
+    <!-- ── Root logger — nível INFO para a aplicação ────────────────────────── -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="APP_FILE"/>
+    </root>
+
+    <!-- ── Em produção: suprimir SQL e detalhes de frameworks ───────────────── -->
+    <springProfile name="prod">
+        <logger name="org.hibernate.SQL"            level="WARN"/>
+        <logger name="org.springframework.security" level="WARN"/>
+        <root level="WARN">
+            <appender-ref ref="APP_FILE"/>
+        </root>
+        <logger name="AUDITORIA" level="INFO" additivity="false">
+            <appender-ref ref="AUDIT_FILE"/>
+        </logger>
+    </springProfile>
+
+</configuration>

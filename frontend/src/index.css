@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --navy:        #3a455f;
+  --navy-2:      #1e293b;
+  --navy-3:      #bdc8d8;
+  --blue:        #2563eb;
+  --blue-2:      #3b82f6;
+  --blue-3:      #bfdbfe;
+  --blue-4:      #eff6ff;
+  --green:       #16a34a;
+  --green-2:     #bbf7d0;
+  --green-3:     #f0fdf4;
+  --amber:       #d97706;
+  --amber-2:     #fde68a;
+  --amber-3:     #fffbeb;
+  --red:         #dc2626;
+  --red-2:       #fecaca;
+  --red-3:       #fef2f2;
+  --purple:      #7c3aed;
+  --purple-2:    #e9d5ff;
+  --purple-3:    #f5f3ff;
+  --gray:        #64748b;
+  --gray-2:      #e2e8f0;
+  --gray-3:      #f8fafc;
+  --gray-4:      #f1f5f9;
+  --white:       #ffffff;
+  --radius:      10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --shadow:      0 1px 3px rgba(224, 207, 207, 0.89), 0 4px 12px rgba(0,0,0,.04);
+  --shadow-md:   0 2px 8px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
+  --sidebar-w:   228px;
+}
+
+body {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--gray-4);
+  color: var(--navy);
+  line-height: 1.5;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--white); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { cursor: pointer; font-family: inherit; }
+input, textarea, select { font-family: inherit; font-size: 14px; }
+
+/* ─── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
