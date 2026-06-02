@@ -3,8 +3,7 @@ package com.extensflow.service;
 import com.extensflow.dto.LoginRequest;
 import com.extensflow.dto.LoginResponse;
 import com.extensflow.exception.BusinessException;
-import com.extensflow.model.*;
-import com.extensflow.repository.UsuarioRepository;
+import com.extensflow.model.UsuarioV2;
 import com.extensflow.repository.UsuarioV2Repository;
 import com.extensflow.security.JwtUtil;
 import org.slf4j.Logger;
@@ -14,91 +13,61 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 public class AuthService {
 
     private static final Logger audit = LoggerFactory.getLogger("AUDITORIA");
 
-    @Autowired private UsuarioRepository   usuarioRepository;
     @Autowired private UsuarioV2Repository usuarioV2Repository;
     @Autowired private PasswordEncoder     passwordEncoder;
     @Autowired private JwtUtil             jwtUtil;
 
+    private static final Map<String, String> FUNCAO_PARA_ROLE = Map.of(
+        "COORDENADOR",        "COORDENADORIA",
+        "COMISSAO_JULGADORA", "COMISSAO",
+        "SECRETARIO",         "SECRETARIA",
+        "ORIENTADOR",         "ORIENTADOR",
+        "ALUNO",              "ALUNO"
+    );
+
+    private static final List<String> PRIORIDADE = List.of(
+        "COORDENADOR", "COMISSAO_JULGADORA", "ORIENTADOR", "SECRETARIO", "ALUNO"
+    );
+
     public LoginResponse login(LoginRequest request, String ipCliente) {
+        UsuarioV2 u = usuarioV2Repository.findByEmailIgnoreCase(request.getEmail())
+                .orElseThrow(() -> {
+                    audit.warn("LOGIN_FAIL motivo=EMAIL_NAO_ENCONTRADO email={} ip={}", request.getEmail(), ipCliente);
+                    return new BusinessException("Credenciais inválidas");
+                });
 
-        // Tenta primeiro nos usuários V2 (com admin/funções), depois nos legados
-        Optional<UsuarioV2> v2Opt = usuarioV2Repository.findByEmailIgnoreCase(request.getEmail());
-
-        if (v2Opt.isPresent()) {
-            UsuarioV2 u = v2Opt.get();
-            validarSenha(request, u.getSenha(), u.isAtivo(), request.getEmail(), u.getId(), ipCliente);
-
-            String perfil = u.isAdmin() ? "ADMIN" : resolverPerfilV2(u);
-            List<String> funcoes = u.getFuncoes().stream()
-                    .map(f -> f.getNome().toUpperCase()).collect(java.util.stream.Collectors.toList());
-            String token = jwtUtil.gerarToken(u.getId(), u.getEmail(), perfil, u.isAdmin(), funcoes);
-            audit.info("LOGIN_OK email={} userId={} perfil={} admin={} funcoes={} ip={}",
-                    u.getEmail(), u.getId(), perfil, u.isAdmin(), funcoes, ipCliente);
-            return new LoginResponse(token, u.getId(), u.getNome(), u.getEmail(), perfil, u.isAdmin(), funcoes);
-        }
-
-        // Fallback: usuários legados (herança)
-        Usuario u = usuarioRepository.findByEmail(request.getEmail()).orElse(null);
-        if (u == null) {
-            audit.warn("LOGIN_FAIL motivo=EMAIL_NAO_ENCONTRADO email={} ip={}", request.getEmail(), ipCliente);
+        if (!passwordEncoder.matches(request.getSenha(), u.getSenha())) {
+            audit.warn("LOGIN_FAIL motivo=SENHA_INCORRETA email={} ip={}", u.getEmail(), ipCliente);
             throw new BusinessException("Credenciais inválidas");
         }
-        validarSenha(request, u.getSenha(), u.isAtivo(), request.getEmail(), u.getId(), ipCliente);
+        if (!u.isAtivo()) {
+            audit.warn("LOGIN_FAIL motivo=USUARIO_INATIVO email={} ip={}", u.getEmail(), ipCliente);
+            throw new BusinessException("Credenciais inválidas");
+        }
 
-        String perfil = resolverPerfilLegado(u);
-        List<String> funcoesLegado = List.of(perfil);
-        String token  = jwtUtil.gerarToken(u.getId(), u.getEmail(), perfil, false, List.of());
-        audit.info("LOGIN_OK email={} userId={} perfil={} ip={}", u.getEmail(), u.getId(), perfil, ipCliente);
-        return new LoginResponse(token, u.getId(), u.getNome(), u.getEmail(), perfil, false, funcoesLegado);
+        List<String> funcoes = u.getFuncoes() != null ? u.getFuncoes() : List.of();
+        String perfil = u.isAdmin() ? "ADMIN" : resolverPerfil(funcoes);
+        String token  = jwtUtil.gerarToken(u.getId(), u.getEmail(), perfil, u.isAdmin(), funcoes);
+
+        audit.info("LOGIN_OK email={} userId={} perfil={} admin={} funcoes={} ip={}",
+                u.getEmail(), u.getId(), perfil, u.isAdmin(), funcoes, ipCliente);
+
+        return new LoginResponse(token, u.getId(), u.getNome(), u.getEmail(), perfil, u.isAdmin(), funcoes);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private void validarSenha(LoginRequest req, String hashSalvo, boolean ativo,
-                               String email, Long userId, String ip) {
-        if (!passwordEncoder.matches(req.getSenha(), hashSalvo)) {
-            audit.warn("LOGIN_FAIL motivo=SENHA_INCORRETA email={} userId={} ip={}", email, userId, ip);
-            throw new BusinessException("Credenciais inválidas");
-        }
-        if (!ativo) {
-            audit.warn("LOGIN_FAIL motivo=USUARIO_INATIVO email={} userId={} ip={}", email, userId, ip);
-            throw new BusinessException("Credenciais inválidas");
-        }
-    }
-
-    private String resolverPerfilV2(UsuarioV2 u) {
-        // Prioridade de perfil: a função de maior privilégio vira o perfil JWT
-        // Mapeamento: nome da Funcao → role usada no JWT / SecurityConfig
-        java.util.Map<String, String> mapa = java.util.Map.of(
-            "COORDENADOR",        "COORDENADORIA",
-            "COMISSAO_JULGADORA", "COMISSAO",
-            "SECRETARIO",         "SECRETARIA",
-            "ORIENTADOR",         "ORIENTADOR",
-            "ALUNO",              "ALUNO"
-        );
-        List<String> prioridade = List.of(
-            "COORDENADOR", "COMISSAO_JULGADORA", "ORIENTADOR", "SECRETARIO", "ALUNO"
-        );
-        return u.getFuncoes().stream()
-                .map(f -> f.getNome().toUpperCase())
-                .filter(prioridade::contains)
-                .min((a, b) -> prioridade.indexOf(a) - prioridade.indexOf(b))
-                .map(f -> mapa.getOrDefault(f, f))
+    private String resolverPerfil(List<String> funcoes) {
+        return funcoes.stream()
+                .map(String::toUpperCase)
+                .filter(PRIORIDADE::contains)
+                .min((a, b) -> PRIORIDADE.indexOf(a) - PRIORIDADE.indexOf(b))
+                .map(f -> FUNCAO_PARA_ROLE.getOrDefault(f, f))
                 .orElse("USUARIO");
-    }
-
-    private String resolverPerfilLegado(Usuario u) {
-        if (u instanceof Aluno)          return "ALUNO";
-        if (u instanceof Orientador)     return "ORIENTADOR";
-        if (u instanceof MembroComissao) return "COMISSAO";
-        return "SECRETARIA";
     }
 }

@@ -1,10 +1,8 @@
-package com.extensflow.repository;
-
+﻿package com.extensflow.repository;
 import com.extensflow.model.Avaliacao;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
-
-public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Long> {
-    List<Avaliacao> findByAvaliadorId(Long avaliadorId);
-    List<Avaliacao> findByEtapaId(Long etapaId);
+public interface AvaliacaoRepository extends MongoRepository<Avaliacao, String> {
+    List<Avaliacao> findByAvaliadorId(String avaliadorId);
+    List<Avaliacao> findByEtapaId(String etapaId);
 }

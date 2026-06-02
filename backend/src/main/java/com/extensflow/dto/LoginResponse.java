@@ -4,14 +4,14 @@ import java.util.List;
 
 public class LoginResponse {
     private final String       token;
-    private final Long         id;
+    private final String       id;
     private final String       nome;
     private final String       email;
     private final String       perfil;
     private final boolean      admin;
     private final List<String> funcoes;
 
-    public LoginResponse(String token, Long id, String nome, String email,
+    public LoginResponse(String token, String id, String nome, String email,
                          String perfil, boolean admin, List<String> funcoes) {
         this.token   = token;
         this.id      = id;
@@ -23,7 +23,7 @@ public class LoginResponse {
     }
 
     public String       getToken()   { return token; }
-    public Long         getId()      { return id; }
+    public String       getId()      { return id; }
     public String       getNome()    { return nome; }
     public String       getEmail()   { return email; }
     public String       getPerfil()  { return perfil; }

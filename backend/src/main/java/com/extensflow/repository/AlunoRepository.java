@@ -1,9 +1,10 @@
 package com.extensflow.repository;
 
-import com.extensflow.model.Aluno;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.extensflow.model.UsuarioV2;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
 
-public interface AlunoRepository extends JpaRepository<Aluno, Long> {
-    Optional<Aluno> findByMatricula(String matricula);
+/** Alias para UsuarioV2Repository focado em alunos. */
+public interface AlunoRepository extends MongoRepository<UsuarioV2, String> {
+    Optional<UsuarioV2> findByMatricula(String matricula);
 }

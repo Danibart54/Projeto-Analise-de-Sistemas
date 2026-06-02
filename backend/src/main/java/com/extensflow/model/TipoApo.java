@@ -1,42 +1,26 @@
 package com.extensflow.model;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "tipos_apo")
+@Document(collection = "tipos_apo")
 public class TipoApo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @NotBlank
-    @Column(nullable = false, length = 200)
     private String nome;
-
-    @Column(length = 1000)
     private String descricao;
-
-    @Column(nullable = false)
-    private Integer creditos = 1;
-
-    @Column(name = "limite_creditos")
+    private Integer creditos      = 1;
     private Integer limiteCreditos;
+    private boolean obrigatoria   = false;
+    private String anoRegra;
+    private String aplicavelPara;
+    private boolean ativo         = true;
 
-    @Column(nullable = false)
-    private boolean obrigatoria = false;
-
-    @Column(name = "ano_regra", length = 10)
-    private String anoRegra; // "ANTES_2026" | "A_PARTIR_2026" | "AMBOS"
-
-    @Column(name = "aplicavel_para", length = 50)
-    private String aplicavelPara; // "MESTRADO" | "DOUTORADO" | "AMBOS"
-
-    @Column(nullable = false)
-    private boolean ativo = true;
-
-    public Long    getId()                        { return id; }
+    public String  getId()                        { return id; }
     public String  getNome()                      { return nome; }
     public void    setNome(String nome)           { this.nome = nome; }
     public String  getDescricao()                 { return descricao; }

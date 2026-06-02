@@ -1,6 +1,5 @@
 package com.extensflow.config;
 
-import com.extensflow.repository.UsuarioRepository;
 import com.extensflow.repository.UsuarioV2Repository;
 import com.extensflow.security.JwtAuthFilter;
 import com.extensflow.security.JwtUtil;
@@ -24,10 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Autowired private JwtUtil jwtUtil;
-    @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired private JwtUtil             jwtUtil;
     @Autowired private UsuarioV2Repository usuarioV2Repository;
-    @Autowired private RateLimitFilter rateLimitFilter;
+    @Autowired private RateLimitFilter     rateLimitFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -36,7 +34,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
-        return new JwtAuthFilter(jwtUtil, usuarioRepository, usuarioV2Repository);
+        return new JwtAuthFilter(jwtUtil, usuarioV2Repository);
     }
 
     @Bean

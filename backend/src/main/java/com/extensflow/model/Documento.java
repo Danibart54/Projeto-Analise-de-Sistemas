@@ -1,34 +1,26 @@
-package com.extensflow.model;
-
-import jakarta.persistence.*;
+﻿package com.extensflow.model;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
-
-@Entity
-@Table(name = "documentos")
+@Document(collection = "documentos")
 public class Documento {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @Id private String id;
     private String tipo;
-    private boolean assinado = false;
+    private String conteudo;
+    private String status;
+    private LocalDateTime dataCriacao = LocalDateTime.now();
     private LocalDateTime dataAssinatura;
-    private String assinadoPor;
-
-    @ManyToOne
-    @JoinColumn(name = "solicitacao_id")
-    private Solicitacao solicitacao;
-
-    public Long getId() { return id; }
+    private String solicitacaoId;
+    public String getId() { return id; }
     public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { this.tipo = tipo; }
-    public boolean isAssinado() { return assinado; }
-    public void setAssinado(boolean assinado) { this.assinado = assinado; }
+    public void setTipo(String t) { this.tipo = t; }
+    public String getConteudo() { return conteudo; }
+    public void setConteudo(String c) { this.conteudo = c; }
+    public String getStatus() { return status; }
+    public void setStatus(String s) { this.status = s; }
+    public LocalDateTime getDataCriacao() { return dataCriacao; }
     public LocalDateTime getDataAssinatura() { return dataAssinatura; }
-    public void setDataAssinatura(LocalDateTime dataAssinatura) { this.dataAssinatura = dataAssinatura; }
-    public String getAssinadoPor() { return assinadoPor; }
-    public void setAssinadoPor(String assinadoPor) { this.assinadoPor = assinadoPor; }
-    public Solicitacao getSolicitacao() { return solicitacao; }
-    public void setSolicitacao(Solicitacao solicitacao) { this.solicitacao = solicitacao; }
+    public void setDataAssinatura(LocalDateTime d) { this.dataAssinatura = d; }
+    public String getSolicitacaoId() { return solicitacaoId; }
+    public void setSolicitacaoId(String id) { this.solicitacaoId = id; }
 }

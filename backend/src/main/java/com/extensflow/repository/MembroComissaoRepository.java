@@ -1,6 +1,4 @@
-package com.extensflow.repository;
-
-import com.extensflow.model.MembroComissao;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface MembroComissaoRepository extends JpaRepository<MembroComissao, Long> {}
+﻿package com.extensflow.repository;
+import com.extensflow.model.UsuarioV2;
+import org.springframework.data.mongodb.repository.MongoRepository;
+public interface MembroComissaoRepository extends MongoRepository<UsuarioV2, String> {}

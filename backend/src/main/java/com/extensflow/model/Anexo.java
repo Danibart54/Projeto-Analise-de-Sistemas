@@ -1,36 +1,26 @@
-package com.extensflow.model;
-
-import jakarta.persistence.*;
+﻿package com.extensflow.model;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
-
-@Entity
-@Table(name = "anexos")
+@Document(collection = "anexos")
 public class Anexo {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String nomeArquivo;
-    private String formato;
+    @Id private String id;
+    private String nomeOriginal;
+    private String caminho;
+    private String contentType;
     private Long tamanho;
-    private String url;
-    private LocalDateTime dataUpload = LocalDateTime.now();
-
-    @ManyToOne
-    @JoinColumn(name = "solicitacao_id")
-    private Solicitacao solicitacao;
-
-    public Long getId() { return id; }
-    public String getNomeArquivo() { return nomeArquivo; }
-    public void setNomeArquivo(String nomeArquivo) { this.nomeArquivo = nomeArquivo; }
-    public String getFormato() { return formato; }
-    public void setFormato(String formato) { this.formato = formato; }
+    private LocalDateTime dataCriacao = LocalDateTime.now();
+    private String solicitacaoId;
+    public String getId() { return id; }
+    public String getNomeOriginal() { return nomeOriginal; }
+    public void setNomeOriginal(String n) { this.nomeOriginal = n; }
+    public String getCaminho() { return caminho; }
+    public void setCaminho(String c) { this.caminho = c; }
+    public String getContentType() { return contentType; }
+    public void setContentType(String c) { this.contentType = c; }
     public Long getTamanho() { return tamanho; }
-    public void setTamanho(Long tamanho) { this.tamanho = tamanho; }
-    public String getUrl() { return url; }
-    public void setUrl(String url) { this.url = url; }
-    public LocalDateTime getDataUpload() { return dataUpload; }
-    public Solicitacao getSolicitacao() { return solicitacao; }
-    public void setSolicitacao(Solicitacao solicitacao) { this.solicitacao = solicitacao; }
+    public void setTamanho(Long t) { this.tamanho = t; }
+    public LocalDateTime getDataCriacao() { return dataCriacao; }
+    public String getSolicitacaoId() { return solicitacaoId; }
+    public void setSolicitacaoId(String id) { this.solicitacaoId = id; }
 }

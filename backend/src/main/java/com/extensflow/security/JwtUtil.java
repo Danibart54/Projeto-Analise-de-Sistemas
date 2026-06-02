@@ -23,12 +23,7 @@ public class JwtUtil {
         this.expiracaoMs = expiracaoMs;
     }
 
-    /**
-     * Gera token com a role principal, a flag admin e a lista completa de funções.
-     * A lista de funções permite que usuários com múltiplos papéis (ex: COORDENADOR +
-     * ORIENTADOR) tenham todas as authorities ativas no Spring Security.
-     */
-    public String gerarToken(Long userId, String email, String role,
+    public String gerarToken(String userId, String email, String role,
                               boolean admin, List<String> funcoes) {
         return Jwts.builder()
                 .subject(email)
@@ -54,8 +49,8 @@ public class JwtUtil {
         return extrairClaims(token).getSubject();
     }
 
-    public Long extrairUserId(String token) {
-        return extrairClaims(token).get("userId", Long.class);
+    public String extrairUserId(String token) {
+        return extrairClaims(token).get("userId", String.class);
     }
 
     public String extrairRole(String token) {
